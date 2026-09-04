@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dr. Sudwal — Notes Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">DR. SUDWAL</p>
+        <h1>Notes Tracker</h1>
+        <p class="subtitle">
+          Keep track of pending notes and completion progress.
+        </p>
+      </div>
+
+      <div class="status-pill">
+        <span></span>
+        Active tracker
+      </div>
+    </header>
+
+
+    <!-- DASHBOARD -->
+    <section class="stats-grid">
+
+      <!-- PENDING -->
+      <article class="stat-card pending-card">
+        <div class="stat-icon">◷</div>
+
+        <div>
+          <span class="stat-label">Pending Notes</span>
+          <strong id="pendingCount">3</strong>
+        </div>
+      </article>
+
+
+      <!-- COMPLETED -->
+      <article class="stat-card completed-card">
+        <div class="stat-icon">✓</div>
+
+        <div>
+          <span class="stat-label">Completed Notes</span>
+          <strong id="completedCount">2</strong>
+        </div>
+      </article>
+
+
+      <!-- VISUAL TRACKER -->
+      <article class="tracker-card">
+
+        <div class="tracker-header">
+
+          <div>
+            <span class="stat-label">Visual Tracker</span>
+            <h2 id="progressText">40% Complete</h2>
+          </div>
+
+          <div class="progress-ring" id="progressRing">
+            40%
+          </div>
+
+        </div>
+
+        <div class="progress-bar">
+          <div
+            class="progress-fill"
+            id="progressFill"
+            style="width: 40%"
+          ></div>
+        </div>
+
+        <p id="progressMessage">
+          2 of 5 notes completed
+        </p>
+
+      </article>
+
+    </section>
+
+
+    <!-- MAIN CONTENT -->
+    <section class="content-grid">
+
+      <!-- ADD NOTE -->
+      <article class="form-card">
+
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">NEW NOTE</span>
+            <h2>Add Pending Note</h2>
+          </div>
+        </div>
+
+
+        <form id="noteForm">
+
+          <label for="visitDate">
+            Date of visit
+          </label>
+
+          <input
+            type="date"
+            id="visitDate"
+            required
+          >
+
+
+          <label for="visitTime">
+            Time of visit
+          </label>
+
+          <input
+            type="time"
+            id="visitTime"
+            required
+          >
+
+
+          <button type="submit">
+            + Add Pending Note
+          </button>
+
+          <p class="form-hint">
+            Only the visit date and time are required.
+          </p>
+
+        </form>
+
+      </article>
+
+
+      <!-- NOTES -->
+      <article class="notes-card">
+
+        <div class="section-heading notes-heading">
+
+            <div>
+            <span class="section-kicker">NOTES</span>
+            <h2>Visit Notes</h2>
+            </div>
+
+            <div class="notes-actions">
+
+            <span class="count-badge" id="totalBadge">
+                5 total
+            </span>
+
+            <button
+                type="button"
+                class="complete-all-btn"
+                id="completeAllBtn"
+            >
+                Complete All
+            </button>
+
+            </div>
+
+        </div>
+
+
+        <div id="notesList" class="notes-list"></div>
+
+      </article>
+
+    </section>
+
+  </div>
+
+    <div
+    id="successMessage"
+    class="success-message"
+    >
+        You rock girl boss! 🎉
+    </div>
+
+
+  <script src="script.js"></script>
+
+</body>
+</html>
