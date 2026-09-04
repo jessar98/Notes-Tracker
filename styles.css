@@ -317,10 +317,12 @@ h1 {
   display: grid;
 
   grid-template-columns:
-    0.85fr
-    1.5fr;
+    1.65fr
+    0.85fr;
 
   gap: 24px;
+
+  align-items: start;
 }
 
 
