@@ -385,7 +385,26 @@ async function completeAllNotes() {
 
 }
 
+function formatTime(timeString) {
+  if (!timeString) return "";
 
+  const [hours, minutes] = timeString.split(":");
+
+  const date = new Date();
+
+  date.setHours(
+    Number(hours),
+    Number(minutes),
+    0,
+    0
+  );
+
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true
+  });
+}
 
 /* =========================
    SUCCESS MESSAGE
@@ -648,7 +667,7 @@ function render() {
           <div class="note-info">
 
             <div class="note-time">
-              ${note.time}
+              ${formatTime(note.time)}
             </div>
 
           </div>
