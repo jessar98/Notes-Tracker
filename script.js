@@ -1,39 +1,94 @@
-const notes = [
-  {
-    id: 1,
-    date: "2026-09-04",
-    time: "09:00",
-    completed: false
-  },
-  {
-    id: 2,
-    date: "2026-09-05",
-    time: "10:30",
-    completed: false
-  },
-  {
-    id: 3,
-    date: "2026-09-08",
-    time: "14:00",
-    completed: false
-  },
-  {
-    id: 4,
-    date: "2026-09-01",
-    time: "09:30",
-    completed: true
-  },
-  {
-    id: 5,
-    date: "2026-08-28",
-    time: "11:00",
-    completed: true
-  }
-];
+/* =========================
+   FIREBASE IMPORTS
+========================= */
+
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 
 
-const form = document.getElementById("noteForm");
-const list = document.getElementById("notesList");
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+
+
+/* =========================
+   FIREBASE CONFIGURATION
+========================= */
+
+const firebaseConfig = {
+
+  apiKey:
+    "AIzaSyBFKWjne4A4v7jqFtr8DLOCxZ3hCVkM8o0",
+
+  authDomain:
+    "drsudwal.firebaseapp.com",
+
+  projectId:
+    "drsudwal",
+
+  storageBucket:
+    "drsudwal.firebasestorage.app",
+
+  messagingSenderId:
+    "293629903723",
+
+  appId:
+    "1:293629903723:web:66220212746db88322c22e"
+
+};
+
+
+
+/* =========================
+   INITIALIZE FIREBASE
+========================= */
+
+const app =
+  initializeApp(firebaseConfig);
+
+
+const db =
+  getFirestore(app);
+
+
+
+/* =========================
+   FIRESTORE COLLECTION
+========================= */
+
+const notesCollection =
+  collection(db, "notes");
+
+
+
+/* =========================
+   LOCAL ARRAY
+========================= */
+
+let notes = [];
+
+
+
+/* =========================
+   DOM ELEMENTS
+========================= */
+
+const form =
+  document.getElementById("noteForm");
+
+const list =
+  document.getElementById("notesList");
+
+const completeAllBtn =
+  document.getElementById("completeAllBtn");
+
 
 
 /* =========================
@@ -42,16 +97,27 @@ const list = document.getElementById("notesList");
 
 function formatDate(dateString) {
 
-  const date = new Date(dateString + "T00:00:00");
+  const date =
+    new Date(dateString + "T00:00:00");
+
 
   return {
-    day: date.getDate(),
 
-    month: date.toLocaleDateString("en-US", {
-      month: "short"
-    })
+    day:
+      date.getDate(),
+
+    month:
+      date.toLocaleDateString(
+        "en-US",
+        {
+          month: "short"
+        }
+      )
+
   };
+
 }
+
 
 
 /* =========================
@@ -63,8 +129,17 @@ function sortNotes() {
 
   notes.sort((a, b) => {
 
-    const dateA = new Date(`${a.date}T${a.time}`);
-    const dateB = new Date(`${b.date}T${b.time}`);
+    const dateA =
+      new Date(
+        `${a.date}T${a.time}`
+      );
+
+
+    const dateB =
+      new Date(
+        `${b.date}T${b.time}`
+      );
+
 
     return dateB - dateA;
 
@@ -73,211 +148,240 @@ function sortNotes() {
 }
 
 
+
 /* =========================
-   RENDER
+   LOAD NOTES FROM FIRESTORE
 ========================= */
 
-function render() {
+async function loadNotes() {
 
-  /* Always sort before displaying */
+  try {
 
-  sortNotes();
-
-
-  /* Count tasks */
-
-  const pending =
-    notes.filter(note => !note.completed).length;
-
-  const completed =
-    notes.filter(note => note.completed).length;
-
-  const total = notes.length;
-
-
-  /* Calculate progress */
-
-  const percent =
-    total > 0
-      ? Math.round((completed / total) * 100)
-      : 0;
-
-
-  /* Update dashboard */
-
-  document.getElementById("pendingCount").textContent =
-    pending;
-
-  document.getElementById("completedCount").textContent =
-    completed;
-
-  document.getElementById("progressText").textContent =
-    `${percent}% Complete`;
-
-  document.getElementById("progressRing").textContent =
-    `${percent}%`;
-
-  document.getElementById("progressFill").style.width =
-    `${percent}%`;
-
-  document.getElementById("progressMessage").textContent =
-    `${completed} of ${total} notes completed`;
-
-  document.getElementById("totalBadge").textContent =
-    `${total} total`;
-
-
-  /* Render notes */
-
-  list.innerHTML = notes.map(note => {
-
-    const formattedDate = formatDate(note.date);
-
-    return `
-
-      <div class="note">
-
-        <div class="note-date">
-
-          <span class="note-day">
-            ${formattedDate.day}
-          </span>
-
-          <span class="note-month">
-            ${formattedDate.month}
-          </span>
-
-        </div>
-
-
-        <div class="note-info">
-
-          <div class="note-time">
-            ${note.time}
-          </div>
-
-        </div>
-
-
-        <span
-          class="note-status ${
-            note.completed
-              ? "completed"
-              : "pending"
-          }"
-        >
-
-          ${
-            note.completed
-              ? "Completed"
-              : "Pending"
-          }
-
-        </span>
-
-
-        ${
-          !note.completed
-            ? `
-              <button
-                class="complete-btn"
-                onclick="completeNote(${note.id})"
-              >
-                Complete
-              </button>
-            `
-            : ""
-        }
-
+    list.innerHTML = `
+      <div class="loading">
+        Loading notes...
       </div>
-
     `;
 
-  }).join("");
+
+    const snapshot =
+      await getDocs(notesCollection);
+
+
+    notes = snapshot.docs.map(
+      document => ({
+
+        id:
+          document.id,
+
+        ...document.data()
+
+      })
+    );
+
+
+    render();
+
+
+  } catch (error) {
+
+    console.error(
+      "Error loading notes:",
+      error
+    );
+
+
+    list.innerHTML = `
+      <div class="loading">
+        Unable to load notes.
+      </div>
+    `;
+
+  }
 
 }
+
+
+
+/* =========================
+   SAVE NOTE TO FIRESTORE
+========================= */
+
+async function addNote(date, time) {
+
+  try {
+
+    await addDoc(
+      notesCollection,
+      {
+
+        date: date,
+
+        time: time,
+
+        completed: false
+
+      }
+    );
+
+
+    await loadNotes();
+
+
+    showSuccessMessage();
+
+
+  } catch (error) {
+
+    console.error(
+      "Error adding note:",
+      error
+    );
+
+
+    alert(
+      "There was a problem saving the note."
+    );
+
+  }
+
+}
+
 
 
 /* =========================
    COMPLETE NOTE
 ========================= */
 
-function completeNote(id) {
+async function completeNote(id) {
 
-  const note = notes.find(
-    note => note.id === id
-  );
+  try {
+
+    const noteReference =
+      doc(
+        db,
+        "notes",
+        id
+      );
 
 
-  if (!note) {
-    return;
+    await updateDoc(
+      noteReference,
+      {
+        completed: true
+      }
+    );
+
+
+    await loadNotes();
+
+
+    showSuccessMessage();
+
+
+  } catch (error) {
+
+    console.error(
+      "Error completing note:",
+      error
+    );
+
+
+    alert(
+      "There was a problem completing the note."
+    );
+
   }
-
-
-  note.completed = true;
-
-
-  render();
-
-
-  showSuccessMessage();
 
 }
 
 
+
 /* =========================
-   ADD NEW NOTE
+   COMPLETE ALL
 ========================= */
 
-form.addEventListener("submit", function(event) {
+async function completeAllNotes() {
 
-  event.preventDefault();
-
-
-  const date =
-    document.getElementById("visitDate").value;
-
-  const time =
-    document.getElementById("visitTime").value;
+  const pendingNotes =
+    notes.filter(
+      note => !note.completed
+    );
 
 
-  if (!date || !time) {
+  if (
+    pendingNotes.length === 0
+  ) {
+
     return;
+
   }
 
 
-  /*
-    Every newly created note
-    ALWAYS starts as pending.
-  */
+  completeAllBtn.disabled = true;
 
-  notes.push({
-
-    id: Date.now(),
-
-    date: date,
-
-    time: time,
-
-    completed: false
-
-  });
+  completeAllBtn.textContent =
+    "Completing...";
 
 
-  /* Clear form */
+  try {
 
-  form.reset();
+    /*
+      Update every pending
+      Firestore document.
+    */
+
+    await Promise.all(
+
+      pendingNotes.map(note => {
+
+        const noteReference =
+          doc(
+            db,
+            "notes",
+            note.id
+          );
 
 
-  /*
-    Render automatically sorts
-    the new note into its
-    correct chronological position.
-  */
+        return updateDoc(
+          noteReference,
+          {
+            completed: true
+          }
+        );
 
-  render();
+      })
 
-});
+    );
+
+
+    await loadNotes();
+
+
+    showSuccessMessage();
+
+
+  } catch (error) {
+
+    console.error(
+      "Error completing all notes:",
+      error
+    );
+
+
+    alert(
+      "There was a problem completing the notes."
+    );
+
+
+  } finally {
+
+    completeAllBtn.disabled = false;
+
+  }
+
+}
+
 
 
 /* =========================
@@ -290,58 +394,381 @@ let successTimeout;
 function showSuccessMessage() {
 
   const message =
-    document.getElementById("successMessage");
+    document.getElementById(
+      "successMessage"
+    );
 
 
   message.classList.add("show");
 
 
-  clearTimeout(successTimeout);
+  clearTimeout(
+    successTimeout
+  );
 
 
-  successTimeout = setTimeout(() => {
+  successTimeout =
+    setTimeout(() => {
 
-    message.classList.remove("show");
+      message.classList.remove(
+        "show"
+      );
 
-  }, 2500);
+    }, 2500);
 
 }
 
 
+
 /* =========================
-   COMPLETE ALL
+   RENDER DASHBOARD
 ========================= */
 
-document
-  .getElementById("completeAllBtn")
-  .addEventListener("click", function() {
+function render() {
 
-    const pendingNotes =
-      notes.filter(note => !note.completed);
+  sortNotes();
 
 
-    if (pendingNotes.length === 0) {
+  const pending =
+    notes.filter(
+      note => !note.completed
+    ).length;
+
+
+  const completed =
+    notes.filter(
+      note => note.completed
+    ).length;
+
+
+  const total =
+    notes.length;
+
+
+  const percent =
+    total > 0
+
+      ? Math.round(
+          (completed / total) * 100
+        )
+
+      : 0;
+
+
+
+  /* =========================
+     DASHBOARD COUNTERS
+  ========================== */
+
+  document.getElementById(
+    "pendingCount"
+  ).textContent =
+    pending;
+
+
+  document.getElementById(
+    "completedCount"
+  ).textContent =
+    completed;
+
+
+  document.getElementById(
+    "progressText"
+  ).textContent =
+    `${percent}% Complete`;
+
+
+  document.getElementById(
+    "progressRing"
+  ).textContent =
+    `${percent}%`;
+
+
+  document.getElementById(
+    "progressFill"
+  ).style.width =
+    `${percent}%`;
+
+
+  document.getElementById(
+    "progressMessage"
+  ).textContent =
+    `${completed} of ${total} notes completed`;
+
+
+  document.getElementById(
+    "totalBadge"
+  ).textContent =
+    `${total} total`;
+
+
+
+  /* =========================
+     COMPLETE ALL BUTTON
+  ========================== */
+
+  if (pending === 0) {
+
+    completeAllBtn.disabled = true;
+
+    completeAllBtn.textContent =
+      "All Completed";
+
+  } else {
+
+    completeAllBtn.disabled = false;
+
+    completeAllBtn.textContent =
+      "Complete All";
+
+  }
+
+
+
+  /* =========================
+     NOTES LIST
+  ========================== */
+
+  if (notes.length === 0) {
+
+    list.innerHTML = `
+      <div class="loading">
+        No visit notes yet.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+
+  list.innerHTML =
+    notes.map(note => {
+
+      const formattedDate =
+        formatDate(
+          note.date
+        );
+
+
+      return `
+
+        <div class="note">
+
+
+          <div class="note-date">
+
+            <span class="note-day">
+              ${formattedDate.day}
+            </span>
+
+            <span class="note-month">
+              ${formattedDate.month}
+            </span>
+
+          </div>
+
+
+
+          <div class="note-info">
+
+            <div class="note-time">
+              ${note.time}
+            </div>
+
+          </div>
+
+
+
+          <span
+            class="note-status ${
+              note.completed
+                ? "completed"
+                : "pending"
+            }"
+          >
+
+            ${
+              note.completed
+                ? "Completed"
+                : "Pending"
+            }
+
+          </span>
+
+
+
+          ${
+            !note.completed
+
+              ? `
+
+                <button
+                  class="complete-btn"
+                  data-id="${note.id}"
+                >
+                  Complete
+                </button>
+
+              `
+
+              : ""
+          }
+
+
+        </div>
+
+      `;
+
+    }).join("");
+
+}
+
+
+
+/* =========================
+   ADD NOTE FORM
+========================= */
+
+form.addEventListener(
+  "submit",
+  async function(event) {
+
+    event.preventDefault();
+
+
+    const date =
+      document.getElementById(
+        "visitDate"
+      ).value;
+
+
+    const time =
+      document.getElementById(
+        "visitTime"
+      ).value;
+
+
+    if (!date || !time) {
+
       return;
+
     }
 
 
-    notes.forEach(note => {
-
-      note.completed = true;
-
-    });
-
-
-    render();
+    const submitButton =
+      form.querySelector(
+        "button[type='submit']"
+      );
 
 
-    showSuccessMessage();
+    submitButton.disabled = true;
 
-  });
+    submitButton.textContent =
+      "Saving...";
+
+
+    try {
+
+      /*
+        IMPORTANT:
+        Every new note is ALWAYS
+        created as pending.
+      */
+
+      await addDoc(
+        notesCollection,
+        {
+
+          date: date,
+
+          time: time,
+
+          completed: false
+
+        }
+      );
+
+
+      form.reset();
+
+
+      await loadNotes();
+
+
+    } catch (error) {
+
+      console.error(
+        "Error adding note:",
+        error
+      );
+
+
+      alert(
+        "There was a problem saving the note."
+      );
+
+
+    } finally {
+
+      submitButton.disabled = false;
+
+      submitButton.textContent =
+        "+ Add Pending Note";
+
+    }
+
+  }
+);
+
 
 
 /* =========================
-   INITIAL LOAD
+   COMPLETE INDIVIDUAL NOTE
 ========================= */
 
-render();
+list.addEventListener(
+  "click",
+  function(event) {
+
+    const button =
+      event.target.closest(
+        ".complete-btn"
+      );
+
+
+    if (!button) {
+
+      return;
+
+    }
+
+
+    const id =
+      button.dataset.id;
+
+
+    completeNote(id);
+
+  }
+);
+
+
+
+/* =========================
+   COMPLETE ALL BUTTON
+========================= */
+
+completeAllBtn.addEventListener(
+  "click",
+  completeAllNotes
+);
+
+
+
+/* =========================
+   START APPLICATION
+========================= */
+
+loadNotes();
