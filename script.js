@@ -13,9 +13,9 @@ import {
   getDocs,
   addDoc,
   updateDoc,
+  deleteDoc,
   doc
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
-
 
 
 /* =========================
@@ -88,6 +88,9 @@ const list =
 
 const completeAllBtn =
   document.getElementById("completeAllBtn");
+
+const deleteAllBtn =
+  document.getElementById("deleteAllBtn");
 
 
 
@@ -418,7 +421,78 @@ function showSuccessMessage() {
 
 }
 
+/* =========================
+   DELETE ALL NOTES
+========================= */
 
+async function deleteAllNotes() {
+
+  if (notes.length === 0) {
+    return;
+  }
+
+
+  const confirmed = confirm(
+    "Are you sure you want to delete ALL notes?\n\nThis cannot be undone."
+  );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  deleteAllBtn.disabled = true;
+
+  deleteAllBtn.textContent =
+    "Deleting...";
+
+
+  try {
+
+    await Promise.all(
+
+      notes.map(note => {
+
+        return deleteDoc(
+          doc(
+            db,
+            "notes",
+            note.id
+          )
+        );
+
+      })
+
+    );
+
+
+    await loadNotes();
+
+
+  } catch (error) {
+
+    console.error(
+      "Firebase delete all error:",
+      error
+    );
+
+
+    alert(
+      "Could not delete all notes."
+    );
+
+
+  } finally {
+
+    deleteAllBtn.disabled = false;
+
+    deleteAllBtn.textContent =
+      "Delete All";
+
+  }
+
+}
 
 /* =========================
    RENDER DASHBOARD
@@ -765,7 +839,10 @@ completeAllBtn.addEventListener(
   completeAllNotes
 );
 
-
+deleteAllBtn.addEventListener(
+  "click",
+  deleteAllNotes
+);
 
 /* =========================
    START APPLICATION

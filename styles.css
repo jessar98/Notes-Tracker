@@ -692,3 +692,52 @@ button:hover {
   }
 
 }
+
+
+/* =========================
+   DELETE ALL
+========================= */
+
+.delete-all-btn {
+  margin: 0;
+
+  padding: 7px 12px;
+
+  border: 1px solid #f2d6d6;
+
+  border-radius: 999px;
+
+  background: #fff1f1;
+
+  color: #c94b4b;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+.delete-all-btn:hover {
+  background: #c94b4b;
+
+  color: white;
+}
+
+
+.delete-all-btn:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+
+@media (max-width: 520px) {
+
+  .notes-actions {
+    align-items: flex-end;
+  }
+
+}
