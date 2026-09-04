@@ -23,6 +23,10 @@
 }
 
 
+/* =========================
+   GLOBAL
+========================= */
+
 body {
   margin: 0;
 
@@ -442,6 +446,15 @@ button:hover {
 }
 
 
+button:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+
 .form-hint {
   margin: 12px 0 0;
 
@@ -478,6 +491,8 @@ button:hover {
   border: 1px solid var(--border);
 
   border-radius: 13px;
+
+  background: var(--white);
 }
 
 
@@ -508,6 +523,8 @@ button:hover {
 
 .note-info {
   flex: 1;
+
+  min-width: 0;
 }
 
 
@@ -526,6 +543,8 @@ button:hover {
 
   font-size: 10px;
   font-weight: 800;
+
+  white-space: nowrap;
 }
 
 
@@ -553,14 +572,145 @@ button:hover {
   color: var(--blue);
 
   font-size: 10px;
+
+  white-space: nowrap;
 }
 
 
 /* =========================
-   RESPONSIVE
+   NOTES ACTIONS
 ========================= */
 
-/* TABLET */
+.notes-actions {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+
+.complete-all-btn {
+  margin: 0;
+
+  padding: 7px 12px;
+
+  border: 1px solid var(--blue-light);
+
+  border-radius: 999px;
+
+  background: var(--blue-light);
+
+  color: var(--blue);
+
+  font-size: 10px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+.complete-all-btn:hover {
+  background: var(--blue);
+
+  color: white;
+}
+
+
+/* =========================
+   DELETE ALL
+========================= */
+
+.delete-all-btn {
+  margin: 0;
+
+  padding: 7px 12px;
+
+  border: 1px solid #f2d6d6;
+
+  border-radius: 999px;
+
+  background: #fff1f1;
+
+  color: #c94b4b;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+.delete-all-btn:hover {
+  background: #c94b4b;
+
+  color: white;
+}
+
+
+.delete-all-btn:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+
+/* =========================
+   SUCCESS MESSAGE
+========================= */
+
+.success-message {
+  position: fixed;
+
+  left: 50%;
+
+  bottom: 30px;
+
+  transform:
+    translate(-50%, 100px);
+
+  padding: 14px 22px;
+
+  border-radius: 12px;
+
+  background: var(--navy);
+
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 800;
+
+  box-shadow:
+    0 12px 30px rgba(23, 35, 60, 0.20);
+
+  opacity: 0;
+
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+
+  z-index: 1000;
+
+  pointer-events: none;
+
+  white-space: nowrap;
+}
+
+
+.success-message.show {
+  opacity: 1;
+
+  transform:
+    translate(-50%, 0);
+}
+
+
+/* =========================
+   TABLET
+========================= */
 
 @media (max-width: 850px) {
 
@@ -583,7 +733,9 @@ button:hover {
   /* Dashboard */
 
   .stats-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns:
+      1fr
+      1fr;
 
     gap: 14px;
   }
@@ -605,7 +757,9 @@ button:hover {
 }
 
 
-/* MOBILE */
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 600px) {
 
@@ -644,9 +798,11 @@ button:hover {
   ========================== */
 
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      1fr
+      1fr;
 
-    gap: 12px;
+    gap: 10px;
 
     margin-bottom: 18px;
   }
@@ -654,12 +810,16 @@ button:hover {
 
   .stat-card {
     padding: 20px;
+
+    gap: 12px;
   }
 
 
   .stat-icon {
     width: 46px;
     height: 46px;
+
+    font-size: 21px;
   }
 
 
@@ -668,8 +828,10 @@ button:hover {
   }
 
 
+  /* Tracker gets its own full row */
+
   .tracker-card {
-    grid-column: auto;
+    grid-column: 1 / -1;
 
     padding: 20px;
   }
@@ -760,21 +922,31 @@ button:hover {
   }
 
 
+  /*
+     DATE | TIME | STATUS | COMPLETE
+
+     Everything stays on ONE row.
+  */
+
   .note {
     display: grid;
 
-    grid-template-columns: 55px 1fr auto;
+    grid-template-columns:
+      50px
+      minmax(0, 1fr)
+      auto
+      auto;
 
-    gap: 10px;
+    gap: 9px;
 
-    padding: 13px;
+    padding: 13px 10px;
 
     align-items: center;
   }
 
 
   .note-date {
-    min-width: 55px;
+    min-width: 50px;
   }
 
 
@@ -799,6 +971,10 @@ button:hover {
     font-size: 13px;
 
     white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
   }
 
 
@@ -812,19 +988,25 @@ button:hover {
 
 
   .complete-btn {
-    grid-column: 2 / -1;
+    grid-column: auto;
 
-    justify-self: end;
+    justify-self: auto;
 
-    padding: 7px 11px;
+    margin: 0;
 
-    font-size: 10px;
+    padding: 7px 9px;
+
+    font-size: 9px;
+
+    white-space: nowrap;
   }
 
 }
 
 
-/* SMALL PHONES */
+/* =========================
+   SMALL PHONES
+========================= */
 
 @media (max-width: 400px) {
 
@@ -835,26 +1017,53 @@ button:hover {
   }
 
 
+  /* Header */
+
   h1 {
     font-size: 27px;
   }
 
 
+  /* Dashboard */
+
   .stat-card {
-    padding: 17px;
+    padding: 15px;
+
+    gap: 8px;
   }
 
+
+  .stat-icon {
+    width: 42px;
+    height: 42px;
+
+    font-size: 19px;
+  }
+
+
+  .stat-card strong {
+    font-size: 25px;
+  }
+
+
+  /* Cards */
 
   .form-card,
   .notes-card {
-    padding: 18px 14px;
+    padding: 18px 12px;
   }
 
+
+  /* Notes actions */
 
   .notes-actions {
     display: grid;
 
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns:
+      1fr
+      1fr;
+
+    gap: 7px;
   }
 
 
@@ -873,152 +1082,152 @@ button:hover {
   }
 
 
-  .note {
-    grid-template-columns: 48px 1fr;
+  /*
+     Keep note on ONE row:
 
-    gap: 9px;
+     DATE | TIME | STATUS | COMPLETE
+  */
+
+  .note {
+    grid-template-columns:
+      42px
+      minmax(0, 1fr)
+      auto
+      auto;
+
+    gap: 6px;
+
+    padding: 11px 7px;
+  }
+
+
+  .note-date {
+    min-width: 42px;
+  }
+
+
+  .note-day {
+    font-size: 16px;
+  }
+
+
+  .note-month {
+    font-size: 8px;
+  }
+
+
+  .note-time {
+    font-size: 12px;
   }
 
 
   .note-status {
-    grid-column: 2;
+    padding: 4px 6px;
 
-    justify-self: start;
+    font-size: 8px;
   }
 
 
   .complete-btn {
-    grid-column: 2;
+    padding: 6px 7px;
 
-    justify-self: start;
+    font-size: 8px;
   }
 
 }
 
 
 /* =========================
-   NOTES ACTIONS
+   VERY SMALL PHONES
 ========================= */
 
-.notes-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+@media (max-width: 350px) {
+
+  .app-shell {
+    padding-left: 7px;
+
+    padding-right: 7px;
+  }
+
+
+  .stat-card {
+    padding: 12px;
+
+    gap: 6px;
+  }
+
+
+  .stat-icon {
+    width: 38px;
+    height: 38px;
+
+    font-size: 17px;
+  }
+
+
+  .stat-card strong {
+    font-size: 23px;
+  }
+
+
+  .stat-label {
+    font-size: 10px;
+  }
+
+
+  .note {
+    grid-template-columns:
+      38px
+      minmax(0, 1fr)
+      auto
+      auto;
+
+    gap: 5px;
+
+    padding: 10px 5px;
+  }
+
+
+  .note-date {
+    min-width: 38px;
+  }
+
+
+  .note-day {
+    font-size: 15px;
+  }
+
+
+  .note-month {
+    font-size: 7px;
+  }
+
+
+  .note-time {
+    font-size: 11px;
+  }
+
+
+  .note-status {
+    padding: 4px 5px;
+
+    font-size: 7px;
+  }
+
+
+  .complete-btn {
+    padding: 5px 6px;
+
+    font-size: 7px;
+  }
+
+
+  .success-message {
+    max-width: 90%;
+
+    padding: 12px 16px;
+
+    font-size: 12px;
+  }
+
 }
-
-
-.complete-all-btn {
-  margin: 0;
-
-  padding: 7px 12px;
-
-  border: 1px solid var(--blue-light);
-
-  border-radius: 999px;
-
-  background: var(--blue-light);
-
-  color: var(--blue);
-
-  font-size: 10px;
-  font-weight: 800;
-
-  cursor: pointer;
-}
-
-
-.complete-all-btn:hover {
-  background: var(--blue);
-
-  color: white;
-}
-
-
-/* =========================
-   SUCCESS MESSAGE
-========================= */
-
-.success-message {
-  position: fixed;
-
-  left: 50%;
-
-  bottom: 30px;
-
-  transform:
-    translate(-50%, 100px);
-
-  padding: 14px 22px;
-
-  border-radius: 12px;
-
-  background: var(--navy);
-
-  color: white;
-
-  font-size: 14px;
-
-  font-weight: 800;
-
-  box-shadow:
-    0 12px 30px rgba(23, 35, 60, 0.20);
-
-  opacity: 0;
-
-  transition:
-    opacity 0.25s ease,
-    transform 0.25s ease;
-
-  z-index: 1000;
-
-  pointer-events: none;
-}
-
-
-.success-message.show {
-  opacity: 1;
-
-  transform:
-    translate(-50%, 0);
-}
-
-
-/* =========================
-   DELETE ALL
-========================= */
-
-.delete-all-btn {
-  margin: 0;
-
-  padding: 7px 12px;
-
-  border: 1px solid #f2d6d6;
-
-  border-radius: 999px;
-
-  background: #fff1f1;
-
-  color: #c94b4b;
-
-  font-size: 10px;
-  font-weight: 800;
-
-  cursor: pointer;
-}
-
-
-.delete-all-btn:hover {
-  background: #c94b4b;
-
-  color: white;
-}
-
-
-.delete-all-btn:disabled {
-  opacity: 0.5;
-
-  cursor: not-allowed;
-
-  transform: none;
-}
-
